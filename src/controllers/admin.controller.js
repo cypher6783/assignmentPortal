@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt');
 
 exports.getDashboard = async (req, res) => {
     try {
-    try {
         const result = await db.query('SELECT * FROM courses ORDER BY created_at DESC');
         res.render('admin/dashboard', { courses: result.rows });
     } catch (err) {
