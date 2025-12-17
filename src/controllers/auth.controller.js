@@ -50,7 +50,7 @@ exports.postLogin = async (req, res) => {
 
     } catch (err) {
         console.error('Login error:', err);
-        res.render('auth/login', { error: 'An unexpected error occurred' });
+        res.render('auth/login', { error: `An unexpected error occurred: ${err.message}` });
     }
 };
 
