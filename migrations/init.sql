@@ -1,11 +1,11 @@
 -- Drop tables if they exist to start fresh (Development only, strictly)
-DROP TABLE IF EXISTS assignments;
-DROP TABLE IF EXISTS courses;
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS admins;
+-- DROP TABLE IF EXISTS assignments;
+-- DROP TABLE IF EXISTS courses;
+-- DROP TABLE IF EXISTS students;
+-- DROP TABLE IF EXISTS admins;
 
 -- Admins Table
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE admins (
 );
 
 -- Students Table
-CREATE TABLE students (
+CREATE TABLE IF NOT EXISTS students (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     matric_number VARCHAR(50) UNIQUE NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE students (
 );
 
 -- Courses Table
-CREATE TABLE courses (
+CREATE TABLE IF NOT EXISTS courses (
     id SERIAL PRIMARY KEY,
     course_code VARCHAR(50) NOT NULL,
     course_title VARCHAR(255) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE courses (
 );
 
 -- Assignments Table
-CREATE TABLE assignments (
+CREATE TABLE IF NOT EXISTS assignments (
     id SERIAL PRIMARY KEY,
     student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
     course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,

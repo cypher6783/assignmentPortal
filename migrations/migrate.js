@@ -3,39 +3,50 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
-const dbConfig = {
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    password: process.env.DB_PASSWORD || 'asphalt6',
-    port: process.env.DB_PORT || 5432,
-};
+const dbConfig = process.env.DATABASE_URL
+    ? {
+          connectionString: process.env.DATABASE_URL,
+          ssl: { rejectUnauthorized: false }
+      }
+    : {
+          user: process.env.DB_USER || 'postgres',
+          host: process.env.DB_HOST || 'localhost',
+          password: process.env.DB_PASSWORD || 'asphalt6',
+          port: process.env.DB_PORT || 5432,
+      };
 
 const targetDbName = process.env.DB_NAME || 'assignment_portal';
 
 async function run() {
     console.log('Starting migration...');
     
-    // Step 1: Create Database if not exists
-    const client = new Client({ ...dbConfig, database: 'postgres' });
-    try {
-        await client.connect();
-        const res = await client.query(`SELECT 1 FROM pg_database WHERE datname = '${targetDbName}'`);
-        if (res.rowCount === 0) {
-            console.log(`Database ${targetDbName} not found. Creating...`);
-            await client.query(`CREATE DATABASE "${targetDbName}"`);
-            console.log(`Database ${targetDbName} created.`);
-        } else {
-            console.log(`Database ${targetDbName} already exists.`);
+    // Step 1: Create Database if not exists (Only for local dev/when not using connection string)
+    if (!process.env.DATABASE_URL) {
+        const client = new Client({ ...dbConfig, database: 'postgres' });
+        try {
+            await client.connect();
+            const res = await client.query(`SELECT 1 FROM pg_database WHERE datname = '${targetDbName}'`);
+            if (res.rowCount === 0) {
+                console.log(`Database ${targetDbName} not found. Creating...`);
+                await client.query(`CREATE DATABASE "${targetDbName}"`);
+                console.log(`Database ${targetDbName} created.`);
+            } else {
+                console.log(`Database ${targetDbName} already exists.`);
+            }
+        } catch (err) {
+            console.error('Error checking/creating database:', err.message);
+        } finally {
+            await client.end();
         }
-    } catch (err) {
-        console.error('Error checking/creating database:', err.message);
-        // Fallback: Proceed, maybe it exists but we can't query pg_database, or maybe we are already in the target db context
-    } finally {
-        await client.end();
     }
 
     // Step 2: Run Schema
-    const targetClient = new Client({ ...dbConfig, database: targetDbName });
+    // If DATABASE_URL is present, Client uses it directly (ignoring database param overrides usually, or we pass it correctly)
+    const clientConfig = process.env.DATABASE_URL 
+        ? dbConfig 
+        : { ...dbConfig, database: targetDbName };
+        
+    const targetClient = new Client(clientConfig);
     try {
         await targetClient.connect();
         console.log(`Connected to ${targetDbName}. Running schema...`);
