@@ -7,6 +7,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Step 0: View Engine Setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // Step 1: Enforce Correct Middleware Order
 app.use(cookieParser());
 
