@@ -1,0 +1,63 @@
+<%- include('../partials/header') %>
+
+<div class="flex-between mb-4">
+    <h2>Student Dashboard</h2>
+</div>
+
+<% if (error) { %>
+    <div class="alert alert-error"><%= error %></div>
+<% } %>
+<% if (success) { %>
+    <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<% if (!activeCourse) { %>
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h3 class="text-muted">No Active Assignments</h3>
+        <p class="text-muted">There are no courses currently accepting submissions. Please check back later.</p>
+    </div>
+<% } else { %>
+
+    <div class="card" style="border-top: 4px solid var(--primary);">
+        <h2 class="mt-0"><%= activeCourse.course_code %>: <%= activeCourse.course_title %></h2>
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+            <strong style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em;">Instructions</strong>
+            <p style="white-space: pre-wrap; margin: 0;"><%= activeCourse.admin_writeup || 'No specific instructions provided.' %></p>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+
+        <% if (submission) { %>
+            <div class="alert alert-success" style="border-color: var(--success); background-color: var(--success-bg);">
+                <div class="flex-gap-2">
+                    <svg style="width: 24px; height: 24px; color: var(--success-text);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <h3 style="margin: 0; color: var(--success-text);">Assignment Submitted</h3>
+                </div>
+                <p style="margin: 0.5rem 0 0 0; color: var(--success-text);">
+                    File: <strong><%= submission.file_path.split('/').pop().split('\\').pop() %></strong><br>
+                    Date: <%= new Date(submission.submitted_at).toLocaleString() %>
+                </p>
+            </div>
+            
+            <div class="alert alert-info" style="background-color: var(--primary-light); border-color: var(--primary); color: var(--primary);">
+                <p class="mb-0"><strong>Note:</strong> Your submission is final and cannot be changed.</p>
+            </div>
+
+        <% } else { %>
+            
+            <form action="/student/upload?_csrf=<%= csrfToken %>" method="POST" enctype="multipart/form-data">
+                <!-- <input type="hidden" name="_csrf" value="<%= csrfToken %>"> -->
+                <div class="form-group">
+                    <label>Select Assignment File</label>
+                    <input type="file" name="assignment" required>
+                    <small class="text-muted">Allowed: PDF, DOCX, ZIP, Code files. Max 10MB.</small>
+                </div>
+                <button type="submit" class="btn">Upload Assignment</button>
+            </form>
+
+
+        <% } %>
+    </div>
+<% } %>
+
+<%- include('../partials/footer') %>

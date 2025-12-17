@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+
+<div class="mb-4">
+    <a href="/admin/dashboard" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+</div>
+
+<div class="card mb-4">
+    <div class="header-content">
+        <div>
+            <h2 class="mt-0"><%= course.course_code %>: <%= course.course_title %></h2>
+            <p class="text-muted mb-2"><%= course.admin_writeup %></p>
+        </div>
+        <div>
+            <a href="/admin/courses/<%= course.id %>/download" class="btn">Download All Submissions (ZIP)</a>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <h3>Submissions</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Matric Number</th>
+                    <th>Student Name</th>
+                    <th>Submitted At</th>
+                    <th>File</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (submissions.length === 0) { %>
+                    <tr><td colspan="4" class="text-muted" style="text-align: center;">No submissions yet.</td></tr>
+                <% } %>
+                <% submissions.forEach(sub => { %>
+                <tr>
+                    <td><%= sub.matric_number %></td>
+                    <td><%= sub.name %></td>
+                    <td><%= new Date(sub.submitted_at).toLocaleString() %></td>
+                    <td><%= sub.file_path.split('/').pop() %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

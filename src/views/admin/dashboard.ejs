@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+
+<div class="flex-between mb-4">
+    <h2>Admin Dashboard</h2>
+    <!-- CSV Upload -->
+    <div class="card" style="margin-bottom: 0; padding: 1rem;">
+        <form action="/admin/students/upload?_csrf=<%= csrfToken %>" method="POST" enctype="multipart/form-data" class="mb-0">
+            <label class="mb-2">Import Students (CSV)</label>
+            <div class="flex-gap-2">
+                <input type="file" name="file" accept=".csv" required style="padding: 0.25rem;">
+                <button type="submit" class="btn">Upload</button>
+            </div>
+            <small class="text-muted mt-0">Format: name, matric_number, level</small>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Create New Course</h3>
+    <form action="/admin/courses" method="POST" class="grid-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div>
+            <label>Course Code</label>
+            <input type="text" name="course_code" placeholder="CS101" required>
+        </div>
+        <div>
+            <label>Course Title</label>
+            <input type="text" name="course_title" placeholder="Intro to CS" required>
+        </div>
+        <div>
+             <label>Description</label>
+             <input type="text" name="admin_writeup" placeholder="Brief instructions...">
+        </div>
+        <button type="submit" class="btn">Create</button>
+    </form>
+</div>
+
+<h3>Courses</h3>
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (courses.length === 0) { %>
+                    <tr><td colspan="4" class="text-muted" style="text-align: center;">No courses found.</td></tr>
+                <% } %>
+                <% courses.forEach(course => { %>
+                <tr>
+                    <td><strong><%= course.course_code %></strong></td>
+                    <td><%= course.course_title %></td>
+                    <td>
+                        <form action="/admin/courses/<%= course.id %>/toggle" method="POST" style="display:inline;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <% if (course.active) { %>
+                                <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                                <span class="badge badge-success" style="margin-left: 0.5rem;">Active</span>
+                            <% } else { %>
+                                <button type="submit" class="btn btn-success btn-sm" style="background-color: var(--success);">Activate</button>
+                                <span class="badge badge-gray" style="margin-left: 0.5rem;">Inactive</span>
+                            <% } %>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="/admin/courses/<%= course.id %>" class="btn btn-secondary btn-sm">View</a>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
