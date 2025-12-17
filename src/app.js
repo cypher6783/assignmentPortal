@@ -62,6 +62,19 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/student', studentRoutes);
 
+// Global Error Handler (Debug Mode)
+app.use((err, req, res, next) => {
+    console.error('--- GLOBAL ERROR HANDLER ---');
+    console.error(err.stack);
+    
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).send('Security Error: Invalid CSRF Token. Please clear cookies and refresh.');
+    }
+
+    // Expose error message to user for debugging (safe enough for this context)
+    res.status(500).send(`<h1>Internal Server Error</h1><pre>${err.message}</pre><p>Check server logs for details.</p>`);
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
