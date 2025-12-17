@@ -35,7 +35,7 @@ app.use((req, res, next) => {
     console.log('Method:', req.method);
     console.log('URL:', req.originalUrl);
     if (req.method === 'POST') {
-        console.log('Body Token:', req.body._csrf);
+        console.log('Body Token:', req.body?._csrf);
         // console.log('Cookies:', req.cookies); // Optional: verify cookies
     }
     next();
